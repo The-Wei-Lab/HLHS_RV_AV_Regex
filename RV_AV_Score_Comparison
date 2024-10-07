@@ -1,0 +1,487 @@
+%sql
+create or replace table sudeep_mprint_hlhs.hybrid_rv_av_score_comparison_redcap_dates as
+with hybrid_pre_closest as
+(SELECT
+    distinct a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate,
+    b.date_pre, b.rv_pre, b.avvi_pre,
+    a.note_date,
+    a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+FROM
+    sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+JOIN
+    workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ON
+    a.person_id = b.person_id
+LEFT JOIN (
+    SELECT
+        a.*,
+        ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+    FROM
+        sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+    JOIN
+        workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+    ON
+        a.person_id = b.person_id
+    WHERE
+        a.note_date <= b.date_pre
+        and b.hybriddate is not null
+        and (a.rv_str_match != '' or a.av_str_match != '')
+) c
+ON
+    a.person_id = c.person_id
+    AND a.note_date = c.note_date
+WHERE
+    c.row_num = 1
+    and b.hybriddate is not null
+    and (a.rv_str_match != '' or a.av_str_match != '')),
+hybrid_plus_14_closest as
+(SELECT
+    DISTINCT a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate,
+    b.date_h1, b.rv_h1, b.avvi_h1,
+    a.note_date,
+    a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+FROM
+    sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+JOIN
+    workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ON
+    a.person_id = b.person_id
+LEFT JOIN (
+    SELECT
+        a.*,
+        ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+    FROM
+        sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+    JOIN
+        workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+    ON
+        a.person_id = b.person_id
+    WHERE
+         b.hybriddate is not null
+         and (a.rv_str_match != '' OR a.av_str_match != '')
+         and ( a.note_date <= b.date_h1)
+) c
+ON
+    a.person_id = c.person_id
+    AND a.note_date = c.note_date
+WHERE
+b.hybriddate is not null
+and c.row_num = 1
+and (a.rv_str_match != '' OR a.av_str_match != '') ),
+hybrid_plus_30_closest as
+(SELECT
+    DISTINCT a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate,
+    b.date_h30, b.rv_h30, b.avvi_h30,
+    a.note_date,
+    a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+FROM
+    sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+JOIN
+    workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ON
+    a.person_id = b.person_id
+LEFT JOIN (
+    SELECT
+        a.*,
+        ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+    FROM
+        sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+    JOIN
+        workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+    ON
+        a.person_id = b.person_id
+    WHERE
+         b.hybriddate is not null and
+         (a.rv_str_match != '' OR a.av_str_match != '')
+         and ( a.note_date <= b.date_h30 )
+) c
+ON
+    a.person_id = c.person_id
+    AND a.note_date = c.note_date
+WHERE
+b.hybriddate is not null
+and c.row_num = 1
+and (a.rv_str_match != '' OR a.av_str_match != '')),
+hybrid_prenwc_closest as
+(SELECT
+    distinct a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate,
+    b.date_prenwc, b.rv_prenwc, b.avvi_prenwc,
+    a.note_date,
+    a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+FROM
+    sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+JOIN
+    workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ON
+    a.person_id = b.person_id
+LEFT JOIN (
+    SELECT
+        a.*,
+        ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+    FROM
+        sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+    JOIN
+        workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+    ON
+        a.person_id = b.person_id
+    WHERE
+        a.note_date <= b.date_prenwc
+        and b.hybriddate is not null
+        and (a.rv_str_match != '' or a.av_str_match != '')
+) c
+ON
+    a.person_id = c.person_id
+    AND a.note_date = c.note_date
+WHERE
+    c.row_num = 1
+    and b.hybriddate is not null
+    and (a.rv_str_match != '' or a.av_str_match != '')),
+combined_union as
+(select a.*, b.date_pre, b.rv_pre, b.avvi_pre, c.date_h1, c.rv_h1, c.avvi_h1, d.date_h30, d.rv_h30, d.avvi_h30,
+e.date_prenwc, e.rv_prenwc, e.avvi_prenwc
+ from sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+left join hybrid_pre_closest b on
+a.study_id = b.study_id AND a.mrn = b.mrn AND a.person_id = b.person_id AND a.note_date = b.note_date
+left join hybrid_plus_14_closest c on
+a.study_id = c.study_id AND a.mrn = c.mrn AND a.person_id = c.person_id AND a.note_date = c.note_date
+left join hybrid_plus_30_closest d on
+a.study_id = d.study_id AND a.mrn = d.mrn AND a.person_id = d.person_id AND a.note_date = d.note_date
+left join hybrid_prenwc_closest e on
+a.study_id = e.study_id AND a.mrn = e.mrn AND a.person_id = e.person_id AND a.note_date = e.note_date
+where a.hybriddate is not null)
+select * from combined_union;
+
+
+
+%sql
+create or replace table sudeep_mprint_hlhs.hybrid_rv_av_score_comparison_redcap_dates_with_flag as 
+SELECT *,
+
+    CASE
+        WHEN date_pre IS NOT NULL THEN
+            CASE WHEN date_pre = note_date and rv_score = rv_pre AND av_score = avvi_pre THEN 1 ELSE 0 END
+        WHEN date_h1 IS NOT NULL THEN
+            CASE WHEN date_h1 = note_date and rv_score = rv_h1 AND av_score = avvi_h1 THEN 1 ELSE 0 END
+        WHEN date_h30 IS NOT NULL THEN
+            CASE WHEN date_h30 = note_date and rv_score = rv_h30 AND av_score = avvi_h30 THEN 1 ELSE 0 END
+        WHEN date_prenwc IS NOT NULL THEN
+            CASE WHEN date_prenwc = note_date and rv_score = rv_prenwc AND av_score = avvi_prenwc THEN 1 ELSE 0 END            
+        ELSE
+            NULL
+    END AS redcap_date_and_score_match,
+        CASE
+        WHEN date_pre IS NOT NULL THEN
+            CASE WHEN date_pre = note_date THEN 1 ELSE 0 END
+        WHEN date_h1 IS NOT NULL THEN
+            CASE WHEN date_h1 = note_date THEN 1 ELSE 0 END
+        WHEN date_h30 IS NOT NULL THEN
+            CASE WHEN date_h30 = note_date THEN 1 ELSE 0 END
+        WHEN date_prenwc IS NOT NULL THEN
+            CASE WHEN date_prenwc = note_date THEN 1 ELSE 0 END            
+        ELSE
+            NULL
+    END AS redcap_date_match,
+        CASE
+        WHEN date_pre IS NOT NULL THEN
+            CASE WHEN rv_score = rv_pre THEN 1 ELSE 0 END
+        WHEN date_h1 IS NOT NULL THEN
+            CASE WHEN rv_score = rv_h1 THEN 1 ELSE 0 END
+        WHEN date_h30 IS NOT NULL THEN
+            CASE WHEN rv_score = rv_h30 THEN 1 ELSE 0 END
+        WHEN date_prenwc IS NOT NULL THEN
+            CASE WHEN rv_score = rv_prenwc THEN 1 ELSE 0 END            
+        ELSE
+            NULL
+    END AS redcap_rv_score_match,
+        CASE
+        WHEN date_pre IS NOT NULL THEN
+            CASE WHEN av_score = avvi_pre THEN 1 ELSE 0 END
+        WHEN date_h1 IS NOT NULL THEN
+            CASE WHEN av_score = avvi_h1 THEN 1 ELSE 0 END
+        WHEN date_h30 IS NOT NULL THEN
+            CASE WHEN av_score = avvi_h30 THEN 1 ELSE 0 END
+        WHEN date_prenwc IS NOT NULL THEN
+            CASE WHEN av_score = avvi_prenwc THEN 1 ELSE 0 END            
+        ELSE
+            NULL
+    END AS redcap_av_score_match
+FROM sudeep_mprint_hlhs.hybrid_rv_av_score_comparison_redcap_dates
+WHERE (date_pre IS NOT NULL OR date_h1 IS NOT NULL OR date_h30 IS NOT NULL OR date_prenwc IS NOT NULL)
+AND (rv_str_match != '' OR av_str_match != '');
+
+%sql
+create or replace table sudeep_mprint_hlhs.norwood_rv_av_score_comparison_redcap_dates as
+with norwood_pre_closest as
+(SELECT
+    distinct a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate,
+    b.date_pre, b.rv_pre, b.avvi_pre,
+    a.note_date,
+    a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+FROM
+    sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+JOIN
+    workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ON
+    a.person_id = b.person_id
+LEFT JOIN (
+    SELECT
+        a.*,
+        ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+    FROM
+        sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+    JOIN
+        workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+    ON
+        a.person_id = b.person_id
+    WHERE
+        a.note_date <= b.date_pre
+        and b.nwdate is not null and b.hybriddate is null
+        and (a.rv_str_match != '' or a.av_str_match != '')
+) c
+ON
+    a.person_id = c.person_id
+    AND a.note_date = c.note_date
+WHERE
+    c.row_num = 1
+    and b.nwdate is not null and b.hybriddate is null
+    and (a.rv_str_match != '' or a.av_str_match != '')),
+norwood_plus_14_closest as
+(SELECT
+     DISTINCT a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate,
+     b.date_nw1, b.rv_nw1, b.avvi_nw1,
+     a.note_date,
+     a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+ FROM
+     sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+ JOIN
+     workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ ON
+     a.person_id = b.person_id
+ LEFT JOIN (
+     SELECT
+         a.*,
+         ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+     FROM
+         sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+     JOIN
+         workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+     ON
+         a.person_id = b.person_id
+     WHERE
+          a.note_date <= b.date_nw1
+          and b.nwdate is not null and b.hybriddate is null
+          and (a.rv_str_match != '' or a.av_str_match != '')
+ ) c
+ ON
+     a.person_id = c.person_id
+     AND a.note_date = c.note_date
+ WHERE
+ b.nwdate is not null and b.hybriddate is null
+ and (a.rv_str_match != '' or a.av_str_match != '')
+ and c.row_num = 1
+),
+norwood_plus_30_closest as
+(
+SELECT
+    DISTINCT a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate,
+    b.date_nw30, b.rv_nw30, b.avvi_nw30,
+    a.note_date,
+    a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+FROM
+    sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+JOIN
+    workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ON
+    a.person_id = b.person_id
+LEFT JOIN (
+    SELECT
+        a.*,
+        ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+    FROM
+        sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+    JOIN
+        workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+    ON
+        a.person_id = b.person_id
+    WHERE
+         (a.rv_str_match != '' OR a.av_str_match != '')
+         and a.note_date <= b.date_nw30
+         and b.nwdate is not null and b.hybriddate is null
+) c
+ON
+    a.person_id = c.person_id
+    AND a.note_date = c.note_date
+WHERE
+b.nwdate is not null and b.hybriddate is null
+and (a.rv_str_match != '' OR a.av_str_match != '')
+and c.row_num = 1
+),
+norwood_closest_nwdc as
+(SELECT
+     DISTINCT a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate,
+     b.date_nwdc, b.rv_nwdc, b.avvi_nwdc,
+     a.note_date,
+     a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+ FROM
+     sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+ JOIN
+     workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ ON
+     a.person_id = b.person_id
+ LEFT JOIN (
+     SELECT
+         a.*,
+         ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+     FROM
+         sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+     JOIN
+         workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+     ON
+         a.person_id = b.person_id
+     WHERE
+          b.nwdate is not null and b.hybriddate is null
+          and (a.rv_str_match != '' OR a.av_str_match != '')
+          and a.note_date <= b.date_nwdc
+ ) c
+ ON
+     a.person_id = c.person_id
+     AND a.note_date = c.note_date
+ WHERE
+  b.nwdate is not null and b.hybriddate is null
+  and (a.rv_str_match != '' OR a.av_str_match != '')
+  and c.row_num = 1),
+norwood_pre_g_closest as
+(
+ SELECT
+     DISTINCT a.study_id, a.mrn, a.person_id, a.norwood_date, a.hybriddate, b.date_pg,
+     b.date_pg, b.rv_pg, b.avvi_pg,
+     a.note_date,
+     a.rv_str_match, a.rv_score, a.av_str_match, a.av_score, c.row_num
+ FROM
+     sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+ JOIN
+     workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+ ON
+     a.person_id = b.person_id
+ LEFT JOIN (
+     SELECT
+         a.*,
+         ROW_NUMBER() OVER (PARTITION BY a.person_id ORDER BY a.note_date DESC) AS row_num
+     FROM
+         sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+     JOIN
+         workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid b
+     ON
+         a.person_id = b.person_id
+     WHERE
+          (a.rv_str_match != '' OR a.av_str_match != '')
+          and b.nwdate is not null and b.hybriddate is null
+          and a.note_date <= b.date_pg
+ ) c
+ ON
+     a.person_id = c.person_id
+     AND a.note_date = c.note_date
+ WHERE
+      (a.rv_str_match != '' OR a.av_str_match != '')
+      and b.nwdate is not null and b.hybriddate is null and c.row_num = 1),
+combined_union as
+(select a.*, b.date_pre, b.rv_pre, b.avvi_pre, c.date_nw1, c.rv_nw1, c.avvi_nw1, d.date_nw30, d.rv_nw30, d.avvi_nw30,
+e.date_nwdc, e.rv_nwdc, e.avvi_nwdc, f.date_pg, f.rv_pg, f.avvi_pg
+ from sudeep_mprint_hlhs.norwood_notes_regex_all_explo a
+left join norwood_pre_closest b on
+a.study_id = b.study_id AND a.mrn = b.mrn AND a.person_id = b.person_id AND a.note_date = b.note_date
+left join norwood_plus_14_closest c on
+a.study_id = c.study_id AND a.mrn = c.mrn AND a.person_id = c.person_id AND a.note_date = c.note_date
+left join norwood_plus_30_closest d on
+a.study_id = d.study_id AND a.mrn = d.mrn AND a.person_id = d.person_id AND a.note_date = d.note_date
+left join norwood_closest_nwdc e on
+a.study_id = e.study_id AND a.mrn = e.mrn AND a.person_id = e.person_id AND a.note_date = e.note_date
+left join norwood_pre_g_closest f on
+a.study_id = f.study_id AND a.mrn = f.mrn AND a.person_id = f.person_id AND a.note_date = f.note_date
+)
+select * from combined_union;
+
+%sql
+create or replace table sudeep_mprint_hlhs.norwood_rv_av_score_comparison_redcap_dates_with_flag as 
+SELECT *,
+    CASE
+        WHEN date_pre IS NOT NULL THEN
+            CASE WHEN date_pre = note_date and rv_score = rv_pre AND av_score = avvi_pre THEN 1 ELSE 0 END
+        WHEN date_nw1 IS NOT NULL THEN
+            CASE WHEN date_nw1 = note_date and rv_score = rv_nw1 AND av_score = avvi_nw1 THEN 1 ELSE 0 END
+        WHEN date_nw30 IS NOT NULL THEN
+            CASE WHEN date_nw30 = note_date and rv_score = rv_nw30 AND av_score = avvi_nw30 THEN 1 ELSE 0 END
+        WHEN date_nwdc IS NOT NULL THEN
+            CASE WHEN date_nwdc = note_date and rv_score = rv_nwdc AND av_score = avvi_nwdc THEN 1 ELSE 0 END
+        WHEN date_pg IS NOT NULL THEN
+            CASE WHEN date_pg = note_date and rv_score = rv_pg AND av_score = avvi_pg THEN 1 ELSE 0 END            
+        ELSE
+            NULL
+    END AS redcap_date_and_score_match,
+        CASE
+        WHEN date_pre IS NOT NULL THEN
+            CASE WHEN date_pre = note_date THEN 1 ELSE 0 END
+        WHEN date_nw1 IS NOT NULL THEN
+            CASE WHEN date_nw1 = note_date THEN 1 ELSE 0 END
+        WHEN date_nw30 IS NOT NULL THEN
+            CASE WHEN date_nw30 = note_date THEN 1 ELSE 0 END
+        WHEN date_nwdc IS NOT NULL THEN
+            CASE WHEN date_nwdc = note_date THEN 1 ELSE 0 END
+        WHEN date_pg IS NOT NULL THEN
+            CASE WHEN date_pg = note_date THEN 1 ELSE 0 END            
+        ELSE
+            NULL
+    END AS redcap_date_match,
+        CASE
+        WHEN date_pre IS NOT NULL THEN
+            CASE WHEN rv_score = rv_pre THEN 1 ELSE 0 END
+        WHEN date_nw1 IS NOT NULL THEN
+            CASE WHEN rv_score = rv_nw1 THEN 1 ELSE 0 END
+        WHEN date_nw30 IS NOT NULL THEN
+            CASE WHEN rv_score = rv_nw30 THEN 1 ELSE 0 END
+        WHEN date_nwdc IS NOT NULL THEN
+            CASE WHEN rv_score = rv_nwdc THEN 1 ELSE 0 END
+        WHEN date_pg IS NOT NULL THEN
+            CASE WHEN rv_score = rv_pg THEN 1 ELSE 0 END            
+        ELSE
+            NULL
+    END AS redcap_rv_score_match,
+        CASE
+        WHEN date_pre IS NOT NULL THEN
+            CASE WHEN av_score = avvi_pre THEN 1 ELSE 0 END
+        WHEN date_nw1 IS NOT NULL THEN
+            CASE WHEN av_score = avvi_nw1 THEN 1 ELSE 0 END
+        WHEN date_nw30 IS NOT NULL THEN
+            CASE WHEN av_score = avvi_nw30 THEN 1 ELSE 0 END
+        WHEN date_nwdc IS NOT NULL THEN
+            CASE WHEN av_score = avvi_nwdc THEN 1 ELSE 0 END
+        WHEN date_pg IS NOT NULL THEN
+            CASE WHEN av_score = avvi_pg THEN 1 ELSE 0 END            
+        ELSE
+            NULL
+    END AS redcap_av_score_match
+FROM sudeep_mprint_hlhs.norwood_rv_av_score_comparison_redcap_dates
+WHERE (date_pre IS NOT NULL OR date_nw1 IS NOT NULL OR date_nw30 IS NOT NULL OR date_nwdc IS NOT NULL
+OR date_pg IS NOT NULL)
+AND (rv_str_match != '' OR av_str_match != '');
+
+%sql
+with no_dups as 
+(SELECT * 
+FROM sudeep_mprint_hlhs.norwood_rv_av_score_comparison_redcap_dates_with_flag main
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM sudeep_mprint_hlhs.norwood_rv_av_score_comparison_redcap_dates_with_flag sub
+    WHERE main.person_id = sub.person_id 
+      AND main.note_date = sub.note_date
+      AND sub.redcap_date_and_score_match = 1
+      AND main.redcap_date_and_score_match = 0
+)),
+final_norwood_rv_av_score_comparison as 
+(select * from no_dups where lower(note_text)  not like '% tee %')
+select distinct study_id, mrn, count(distinct note_date) as distinct_note_count,
+SUM(CASE WHEN redcap_date_and_score_match = 1 THEN 1 ELSE 0 END) AS redcap_match_count,
+SUM(CASE WHEN redcap_date_and_score_match = 0 THEN 1 ELSE 0 END) AS redcap_non_match_count
+from final_norwood_rv_av_score_comparison
+group by 1,2;
+

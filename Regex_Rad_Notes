@@ -1,0 +1,453 @@
+# List of regluar expression search terms v4 - based on Sudeep feedback 2/26/24
+# Modified qualifer terms, made into separate phrase
+# Separate out qualifier terms into scores
+# Finish AV mods
+
+# RV function
+# Qualifiers
+# rv_qual_target = '(normal|normal to hyperdynamic|low normal|good|hyperdynamic|borderline|borderline (depressed|reduced|decreased)|mildly (depressed|reduced|decreased)|mild( |-)moderately (depressed|reduced|decreased)|mild to moderately (depressed|reduced|decreased)|moderately (depressed|reduced|decreased)|moderate( |-)severely (depressed|reduced|decreased)|moderate to severely (depressed|reduced|decreased)|severely (depressed|reduced|decreased)|markedly (depressed|reduced|decreased))'
+
+rv_qual_score_0 = 'normal|normal to hyperdynamic|low normal|good|hyperdynamic|vigorous|normal global|good overall|remains preserved|qualitatively normal|preserved|normal qualitative|well preserved|grossly normal|normal\\\\s*systemic|low normal to borderline depressed'
+rv_qual_score_1 = 'borderline|borderline\\\\s*(depressed|reduced|decreased|diminished|depresssed|to mildly depressed)|borderline\\\/mildly'
+rv_qual_score_2 = '(mildly|mild)\\\\s*(depressed|decpressed|reduced|decreased|decrease|diminished|depresssed)( |,|.)?'
+rv_qual_score_3 = 'mild( |-| - )moderately (depressed|reduced|decreased|diminished|depresssed)|(mild to moderately|mild to moderate|mildly to moderately|mild-to-moderately)\\\\s*(depressed|reduced|decreased|diminished|depresssed)'
+rv_qual_score_4 = '(moderately|moderately to markedly|moderate to marked|moderate to markedly)\\\\s*(depressed|reduced|decreased|diminished|depresssed)( |,|.)?'
+rv_qual_score_5 = 'moderate( |-)severely (depressed|depresssed|reduced|decreased|diminished)|moderate to severely (depressed|reduced|decreased|diminished|depresssed)'
+rv_qual_score_6 = 'severely (depressed|depresssed|reduced|decreased|diminished)|markedly (\\\\(globally\\\\) )?(depressed|reduced|decreased|diminished|depresssed)'
+
+# Sum together rv qualifier
+rv_qual = '(' + rv_qual_score_6 + '|' + rv_qual_score_5 + '|' + rv_qual_score_4 + '|' + rv_qual_score_3 + '|' + rv_qual_score_2 + '|' + rv_qual_score_1 + '|' + rv_qual_score_0 + ')'
+
+# print(rv_qual_target)
+# print(' ')
+# print(rv_qual)
+
+# Key phrases
+rv_key_phrases_1 = '(\\\\s*single\\\\s*(ventricular|venticular|ventricle|ventircular|ventriclar)( systolic)?( function)?(\\\\s*wall\\\\s*motion)?\\\\s*)'
+rv_key_phrases_2 = '(\\\\s*(single)?\\\\s*right( and left | ventricular and left )?\\\\s*(ventricular|venticular|ventricle|ventircular|ventriclar)(\\\\s*systolic\\\\s*function|\\\\s*wall\\\\s*motion|function)?\\\\s*)'
+rv_key_phrases_3 = '(\\\\s*(global\\\\s*)?rv(\\\\s*systolic)?(\\\\s*function)?(\\\\s*wall\\\\s*motion)?\\\\s*)'
+rv_key_phrases_4 = '(\\\\s*biventricular(\\\\s*systolic\\\\s*function|\\\\s*wall\\\\s*motion|function)?\\\\s*)'
+rv_key_phrases_5 = '(\\\\s*systolic function\\\\s*)'
+rv_key_phrases_6 = '(\\\\s*(right|right and left|bi)\\\\s*(ventricular|venticular|ventircular)(\\\\s*systolic\\\\s*function|\\\\s*wall\\\\s*motion|function)?\\\\s*)'
+
+rv_test_regex = '('+ rv_key_phrases_1 +'|'+ rv_key_phrases_2 +'|'+ rv_key_phrases_3 + '|'+ rv_key_phrases_4 + '|'+ rv_key_phrases_5 + '|'+ rv_key_phrases_6 +')';
+
+# regular expression
+# rv_regex = '(?i)'+ rv_qual +'('+ rv_key_phrases_1 +'|'+ rv_key_phrases_2 +'|'+ rv_key_phrases_3 +'|'+ rv_key_phrases_4 +')'
+rv_regex_1 = rv_qual +'('+ rv_key_phrases_1 +'|'+ rv_key_phrases_2 +'|'+ rv_key_phrases_3 + '|'+ rv_key_phrases_4 + '|'+ rv_key_phrases_5 + '|'+ rv_key_phrases_6 +')'
+rv_regex_2 = '('+ rv_key_phrases_1 +'|'+ rv_key_phrases_2 +'|'+ rv_key_phrases_3 +'|'+ rv_key_phrases_4 + '|'+ rv_key_phrases_5 + '|'+ rv_key_phrases_6 +')' + '(\\\\s*is\\\\s*| is at least | appears | appears to be | seems | seems to be | appeared | remains | at least | is subjectively | is now | is only | are | is overall | is probably )' + rv_qual
+rv_regex_3 = '('+ rv_key_phrases_1 +'|'+ rv_key_phrases_2 +'|'+ rv_key_phrases_3 +'|'+ rv_key_phrases_4 + '|'+ rv_key_phrases_5 + '|'+ rv_key_phrases_6 +')' +' with\\\\s*' + rv_qual +'\\\\s*(systolic)?\\\\s*wall motion'
+rv_regex_4 = '('+ rv_key_phrases_1 +'|'+ rv_key_phrases_2 +'|'+ rv_key_phrases_3 +'|'+ rv_key_phrases_4 + '|'+ rv_key_phrases_5 + '|'+ rv_key_phrases_6 +')' +' with ' + rv_qual +' function'
+rv_regex_5 = '('+ rv_key_phrases_1 +'|'+ rv_key_phrases_2 +'|'+ rv_key_phrases_3 + '|'+ rv_key_phrases_4 + '|'+ rv_key_phrases_5 + '|'+ rv_key_phrases_6 +')' + rv_qual
+rv_regex_6 = rv_qual + '(\\\\s*in the\\\\s*| in )' + '('+ rv_key_phrases_1 +'|'+ rv_key_phrases_2 +'|'+ rv_key_phrases_3 + '|'+ rv_key_phrases_4 + '|'+ rv_key_phrases_5 + '|'+ rv_key_phrases_6 +')'
+
+# Sum together to create regular expression
+rv_regex = '(?i)'+ '('+ rv_regex_2 + '|'+ rv_regex_3 + '|'+ rv_regex_4 + '|'+ rv_regex_5 + '|'+ rv_regex_6 + '|' + rv_regex_1 + ')' 
+
+
+##### ------------------------------------------------------------------------------------------------------------------- #####
+
+# AV valve insufficiency
+# Qualifiers
+# av_qual_target = '(no|no significant|none|insignificant|physiologic|trivial|mild|mild( |-)moderate|mild to moderate|moderate|moderate( |-)severe|moderate to severe|severe|marked)'
+
+av_qual_score_0 = 'nosignificant|not significant|none|insignificant|without significant|physiologic|trivial|trace|no|normal|trivial to mild|physiologic to mild|no significant|normal|trace to mild'
+av_qual_score_1 = 'mild|mild\\\\+'
+av_qual_score_2 = 'mild( |-)moderate|mild to moderate|mild\\\\s*\\\\(to moderate\\\\)|mild-to-moderate|mild\\\\s*-\\\\s*moderate'
+av_qual_score_3 = 'moderate'
+av_qual_score_4 = 'moderate( |-)(severe|servere|svere)|moderate to (severe|servere|svere)|moderate\\\\s*-\\\\s*severe|moderate to marked'
+av_qual_score_5 = 'severe|marked|servere|svere'
+
+# Sum together rv qualifier
+av_qual = '(' + '\\\\s*' + av_qual_score_0 + '\\\\s*' + '|' + '\\\\s*' + av_qual_score_1 + '\\\\s*' + '|' + '\\\\s*' + av_qual_score_2 + '\\\\s*' + '|' + '\\\\s*' + av_qual_score_3 + '\\\\s*' + '|' + '\\\\s*' + av_qual_score_4 + '\\\\s*' + '|' + '\\\\s*' + av_qual_score_5 + '\\\\s*' + ')'
+
+# print(av_qual_target)
+# print(' ')
+# print(av_qual)
+
+# Key phrases
+# av_key_phrases_1 = '( (right|tricuspid)( av| atrioventricular)? valve regurgitation)'
+# av_key_phrases_2 = '( (right|tricuspid)( av| atrioventricular)? valve insufficiency)'
+# av_key_phrases_3 = '( tr | ravvi)'
+# av_key_phrases_1 = '( (right|tricuspid|tricupsid)( av| atrioventricular)?( valve)? regurgitation)'
+# av_key_phrases_2 = '( (right|tricuspid|tricupsid)( av| atrioventricular)?( valve)? insufficiency)'
+# av_key_phrases_3 = '( tr( |,)| ravvi)'
+av_key_phrases_1 = '(\\\\s*(right|right( |-| - )sided|tricuspid|tricupid|tricupsid|neoaortic and tricuspid|neoaortic and tricupid|tricuspid and neoaortic|tricupid and neoaortic|tricuspid and neo-aortic|tricupid and neo-aortic|mitral and tricuspid|mitral and tricupid|tricupid and mitral|tricuspid and mitral|common|tricuspid or pulmonary|tricupid or pulmonary|tricupid and pulmonic|tricuspid and pulmonic|tricupid and pulmonary|tricuspid and pulmonary|pulmonary and tricuspid|pulmonary and tricupid|tricupid and aortic|tricuspid and aortic|aortic and tricuspid|tricuspid or neoaortic|tricuspid, aortic and pulmonary)\\\\s*( av| atrioventricular)?( valve| valves)?\\\\s*(regurgitation|insufficiency|without insufficiency|valvar regurgitation|insuffciency|abnormalities|function|valvar dysfunction)\\\\s*)'
+av_key_phrases_2 = '(\\\\s*tr\\\\b( |,)?| ravvi\\\\s*)'
+av_key_phrases_3 = '(\\\\s*(right|tricupid|tricuspid|tricupsid|neoaortic and tricupid|neoaortic and tricuspid|tricupid and neoaortic|tricuspid and neoaortic|tricupid and neo-aortic|tricuspid and neo-aortic|mitral and tricupid|mitral and tricuspid|tricupid and mitral|tricuspid and mitral|common|tricupid and pulmonary|tricuspid and pulmonary)?( av| atrioventricular)?\\\\s*(valve|valves)? annulus\\\\s*)'
+
+av_key_phrases_4 = '(\\\\s*neo\\\\s*ai\\\\s*and\\\\s*tr\\\\s*)'
+av_key_phrases_5 = '(\\\\s*(valve|valves|tricuspid or neoaortic valve|valvar|tricuspid valve|tricupid valve)(\\\\s*insufficiency|dysfunction|regurgitation))'
+av_key_phrases_6 = '(\\\\s*(tricupid|tricuspid|tricupsid|neoaortic and tricuspid|tricuspid and neoaortic|tricuspid and neo-aortic|mitral and tricuspid|tricuspid and mitral|common|tricuspid or pulmonary|tricuspid and pulmonic|tricuspid and pulmonary|pulmonary and tricuspid|tricuspid and aortic|aortic and tricuspid|tricuspid or neoaortic)\\\\s*(valve|valves)(\\\\s*insufficiency|dysfunction|regurgitation)?)'
+
+# regular expression
+# av_regex = '(?i)'+ av_qual +'('+ av_key_phrases_1 +'|'+ av_key_phrases_2 +'|'+ av_key_phrases_3 +')'
+# av_regex = '(?i)'+ av_qual +'('+ av_key_phrases_1 +'|'+ av_key_phrases_2 +')'
+av_regex_1 = av_qual + '(' + av_key_phrases_1 + '|' + av_key_phrases_2 + ')'
+av_regex_2 = '(' + av_key_phrases_1 + '|' + av_key_phrases_2 + ')' + '(\\\\s*is\\\\s*| is at least | appears | appears to be | seems | seems to be | remains | appear )' + av_qual
+av_regex_3 = av_key_phrases_3 + ' with( overall)? ' + av_qual + ' (regurgitation|insufficiency|insuffciency)'
+av_regex_4 = av_qual + av_key_phrases_4
+av_regex_5 = av_qual + av_key_phrases_5
+av_regex_6 = av_qual + av_key_phrases_6
+
+# Sum together to create regular expression
+av_regex = '(?i)'+ '(' + av_regex_1 + '|' + av_regex_2 + '|' + av_regex_3 + '|' + av_regex_4 + '|' + av_regex_5  + '|' + av_regex_6 + ')' 
+# av_regex = '(?i)'+ '(' + av_regex_1 + '|' + av_regex_2 + ')' 
+
+print(rv_regex)
+print(' ')
+print (av_regex)
+
+# Search for phrases - using updated search terms
+create_table_sql = f"""
+create or replace table sudeep_mprint_hlhs.norwood_notes_regex_all_explo as 
+select n.*, 
+lower(regexp_extract(note_text,'""" + rv_regex + """', 0)) as rv_str_match, 
+lower(regexp_extract(note_text,'""" + av_regex + """', 0)) as av_str_match 
+from workspace_rdphenotypecore.sudeep_mprint_hlhs.combined_notes as n
+"""
+spark.sql(create_table_sql)
+
+# Search for phrases - using updated search terms + add scores
+create_table_sql = f"""
+create or replace table sudeep_mprint_hlhs.norwood_notes_regex_all_explo as 
+select n.*, 
+lower(regexp_extract(note_text,'""" + rv_regex + """', 0)) as rv_str_match, 
+-- Add RV function scores
+(
+case
+when rv_str_match = '' then 'null'
+when rv_str_match regexp '""" + '(?i)' + '(' + rv_qual_score_0 + ')' + """' then 0
+when rv_str_match regexp '""" + '(?i)' + '(' + rv_qual_score_1 + ')' + """' then 1
+when rv_str_match regexp '""" + '(?i)' + '(' + rv_qual_score_2 + ')' + """' then 2
+when rv_str_match regexp '""" + '(?i)' + '(' + rv_qual_score_3 + ')' + """' then 3
+when rv_str_match regexp '""" + '(?i)' + '(' + rv_qual_score_4 + ')' + """' then 4
+when rv_str_match regexp '""" + '(?i)' + '(' + rv_qual_score_5 + ')' + """' then 5
+when rv_str_match regexp '""" + '(?i)' + '(' + rv_qual_score_6 + ')' + """' then 6
+else 'no_match'
+end
+) as rv_score,
+lower(regexp_extract(note_text,'""" + av_regex + """', 0)) as av_str_match,
+-- Add AV function scores
+(
+case
+when av_str_match = '' then 'null'
+when av_str_match regexp '""" + '(?i)' + '(' + av_qual_score_0 + ')' + """' then 0
+when av_str_match regexp '""" + '(?i)' + '(' + av_qual_score_2 + ')' + """' then 2
+when av_str_match regexp '""" + '(?i)' + '(' + av_qual_score_1 + ')' + """' then 1
+when av_str_match regexp '""" + '(?i)' + '(' + av_qual_score_4 + ')' + """' then 4
+when av_str_match regexp '""" + '(?i)' + '(' + av_qual_score_3 + ')' + """' then 3
+when av_str_match regexp '""" + '(?i)' + '(' + av_qual_score_5 + ')' + """' then 5
+else 'no_match'
+end
+) as av_score
+from workspace_rdphenotypecore.sudeep_mprint_hlhs.combined_notes as n
+"""
+spark.sql(create_table_sql)
+
+
+create_table_sql = f"""
+create or replace table sudeep_mprint_hlhs.norwood_notes_regex_all_explo_all_occurrences as 
+select n.*, 
+transform(
+    regexp_extract_all(note_text, '""" + rv_regex + """'), 
+    term -> struct(
+        lower(term) as rv_str_match,
+        case
+            when lower(term) = '' then 'null'
+            when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_0 + ')' + """' then 0
+            when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_1 + ')' + """' then 1
+            when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_2 + ')' + """' then 2
+            when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_3 + ')' + """' then 3
+            when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_4 + ')' + """' then 4
+            when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_5 + ')' + """' then 5
+            when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_6 + ')' + """' then 6
+            else 'no_match'
+        end as rv_score
+    )
+) as rv_matches, 
+transform(
+    regexp_extract_all(note_text, '""" + av_regex + """'), 
+    term -> struct(
+        lower(term) as av_str_match,
+        case
+            when lower(term) = '' then 'null'
+            when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_0 + ')' + """' then 0
+            when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_2 + ')' + """' then 2
+            when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_1 + ')' + """' then 1
+            when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_3 + ')' + """' then 3
+            when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_4 + ')' + """' then 4
+            when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_5 + ')' + """' then 5
+            else 'no_match'
+        end as av_score
+    )
+) as av_matches
+from workspace_rdphenotypecore.sudeep_mprint_hlhs.combined_notes as n
+"""
+spark.sql(create_table_sql)
+
+
+create_table_sql = f"""
+create or replace table sudeep_mprint_hlhs.norwood_notes_regex_all_explo_all_occurrences as 
+select n.*, 
+    -- Extract the term with maximum RV score
+    element_at(
+        array_sort(
+            transform(
+                regexp_extract_all(note_text, '""" + rv_regex + """'),
+                term -> struct(
+                    lower(term) as rv_str_match,
+                    case
+                        when lower(term) = '' then -1
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_0 + ')' + """' then 0
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_1 + ')' + """' then 1
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_2 + ')' + """' then 2
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_3 + ')' + """' then 3
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_4 + ')' + """' then 4
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_5 + ')' + """' then 5
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_6 + ')' + """' then 6
+                        else -1
+                    end as rv_score
+                )
+            ),
+            (a, b) -> if(a.rv_score > b.rv_score, -1, 1)
+        ),
+        1
+    ).rv_str_match as rv_str_match,
+    element_at(
+        array_sort(
+            transform(
+                regexp_extract_all(note_text, '""" + rv_regex + """'),
+                term -> struct(
+                    lower(term) as rv_str_match,
+                    case
+                        when lower(term) = '' then -1
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_0 + ')' + """' then 0
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_1 + ')' + """' then 1
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_2 + ')' + """' then 2
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_3 + ')' + """' then 3
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_4 + ')' + """' then 4
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_5 + ')' + """' then 5
+                        when lower(term) regexp '""" + '(?i)' + '(' + rv_qual_score_6 + ')' + """' then 6
+                        else -1
+                    end as rv_score
+                )
+            ),
+            (a, b) -> if(a.rv_score > b.rv_score, -1, 1)
+        ),
+        1
+    ).rv_score as rv_score,
+    -- Extract the term with maximum AV score
+    element_at(
+        array_sort(
+            transform(
+                regexp_extract_all(note_text, '""" + av_regex + """'),
+                term -> struct(
+                    lower(term) as av_str_match,
+                    case
+                        when lower(term) = '' then -1
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_0 + ')' + """' then 0
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_2 + ')' + """' then 2
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_1 + ')' + """' then 1
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_3 + ')' + """' then 3
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_4 + ')' + """' then 4
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_5 + ')' + """' then 5
+                        else -1
+                    end as av_score
+                )
+            ),
+            (a, b) -> if(a.av_score > b.av_score, -1, 1)
+        ),
+        1
+    ).av_str_match as av_str_match,
+    element_at(
+        array_sort(
+            transform(
+                regexp_extract_all(note_text, '""" + av_regex + """'),
+                term -> struct(
+                    lower(term) as av_str_match,
+                    case
+                        when lower(term) = '' then -1
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_0 + ')' + """' then 0
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_2 + ')' + """' then 2
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_1 + ')' + """' then 1
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_3 + ')' + """' then 3
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_4 + ')' + """' then 4
+                        when lower(term) regexp '""" + '(?i)' + '(' + av_qual_score_5 + ')' + """' then 5
+                        else -1
+                    end as av_score
+                )
+            ),
+            (a, b) -> if(a.av_score > b.av_score, -1, 1)
+        ),
+        1
+    ).av_score as av_score
+from workspace_rdphenotypecore.sudeep_mprint_hlhs.combined_notes as n
+"""
+spark.sql(create_table_sql)
+
+
+
+%sql
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set rv_str_match =  
+  CASE 
+    WHEN regexp_extract(note_text, '(?i)(mildly to moderately decreased function|moderately decreased function|good wall motion|normal wall motion|good freewall motion|good free wall motion|vigorous overall wall motion|improved rv wall motion|preserved wall motion|right ventricle has normal size and function|right ventricle\\s*with normal systolic wall motion)') <> '' 
+    THEN regexp_extract(note_text, '(?i)(mildly to moderately decreased function|moderately decreased function|good wall motion|normal wall motion|good freewall motion|good free wall motion|vigorous overall wall motion|improved rv wall motion|preserved wall motion|right ventricle has normal size and function|right ventricle\\s*with normal systolic wall motion)', 1)
+    ELSE rv_str_match
+  END,
+  rv_score = 0  
+WHERE rv_str_match = ''
+  AND regexp(note_text, '(?i)mildly to moderately decreased function|moderately decreased function|good wall motion|normal wall motion|good freewall motion|good free wall motion|vigorous overall wall motion|improved rv wall motion|preserved wall motion|right ventricle has normal size and function|right ventricle\\s*with normal systolic wall motion');
+
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set rv_str_match =  
+  CASE 
+    WHEN regexp_extract(note_text, '(?i)(borderline/mildly depressed rv wall motion)') <> '' 
+    THEN regexp_extract(note_text, '(?i)(borderline/mildly depressed rv wall motion)', 1)
+    ELSE rv_str_match
+  END,
+  rv_score = 1  
+WHERE regexp(note_text, '(?i)borderline/mildly depressed rv wall motion');
+
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set rv_str_match =  
+  CASE 
+    WHEN regexp_extract(note_text, '(?i)(rv with mildly depressed systolic wall motion)') <> '' 
+    THEN regexp_extract(note_text, '(?i)(rv with mildly depressed systolic wall motion)', 1)
+    ELSE rv_str_match
+  END,
+  rv_score = 2
+WHERE regexp(note_text, '(?i)rv with mildly depressed systolic wall motion');
+
+%sql
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set av_str_match =
+  CASE
+    WHEN regexp_extract(note_text, '(?i)(no significant av valve regurgitation)') <> ''
+    THEN regexp_extract(note_text, '(?i)(no significant av valve regurgitation)', 1)
+    ELSE av_str_match
+  END,
+  av_score = 0
+WHERE av_str_match = ''
+  AND regexp(note_text, '(?i)no significant av valve regurgitation');
+
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set av_str_match =
+  CASE
+    WHEN regexp_extract(note_text, '(?i)(mild tricuspid and trivial neo-aortic insufficiency)') <> ''
+    THEN regexp_extract(note_text, '(?i)(mild tricuspid and trivial neo-aortic insufficiency)', 1)
+    ELSE av_str_match
+  END,
+  av_score = 1
+WHERE regexp(note_text, '(?i)mild tricuspid and trivial neo-aortic insufficiency');
+
+
+%sql
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set av_str_match =
+  CASE
+    WHEN regexp_extract(note_text, '(?i)(no significant av valve regurgitation)') <> ''
+    THEN regexp_extract(note_text, '(?i)(no significant av valve regurgitation)', 1)
+    ELSE av_str_match
+  END,
+  av_score = 0
+WHERE av_str_match = ''
+  AND regexp(note_text, '(?i)no significant av valve regurgitation');
+
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set av_str_match =
+  CASE
+    WHEN regexp_extract(note_text, '(?i)(mild tricuspid and trivial neo-aortic insufficiency)') <> ''
+    THEN regexp_extract(note_text, '(?i)(mild tricuspid and trivial neo-aortic insufficiency)', 1)
+    ELSE av_str_match
+  END,
+  av_score = 1
+WHERE regexp(note_text, '(?i)mild tricuspid and trivial neo-aortic insufficiency');
+
+%sql
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo 
+set av_str_match =  
+  CASE 
+    WHEN regexp_extract(note_text, '(?i)(no\\s*significant\\s*dysfunction\\s*of\\s*tricuspid\\s*or\\s*neoaortic\\s*valves|no\\s*significant\\s*neoaortic\\s*valve\\s*or\\s*tricuspid\\s*valve\\s*insufficiency|no\\s*significant\\s*neoaortic\\s*insufficiency\\s*or\\s*tricuspid\\s*valve\\s*insufficiency|no\\s*significant\\s*tricuspid\\s*or\\s*pulmonary\\s*valve\\s*dysfunction|normal\\s*sized\\s*Tricuspid\\s*annulus\\s*without\\s*significant\\s*insufficiency|no\\s*significant\\s*valvar\\s*insufficiency)') <> '' 
+    THEN regexp_extract(note_text, '(?i)(no\\s*significant\\s*dysfunction\\s*of\\s*tricuspid\\s*or\\s*neoaortic\\s*valves|no\\s*significant\\s*neoaortic\\s*valve\\s*or\\s*tricuspid\\s*valve\\s*insufficiency|no\\s*significant\\s*neoaortic\\s*insufficiency\\s*or\\s*tricuspid\\s*valve\\s*insufficiency|no\\s*significant\\s*tricuspid\\s*or\\s*pulmonary\\s*valve\\s*dysfunction|normal\\s*sized\\s*Tricuspid\\s*annulus\\s*without\\s*significant\\s*insufficiency|no\\s*significant\\s*valvar\\s*insufficiency)', 1)
+    ELSE av_str_match
+  END,
+  av_score = 0 
+WHERE av_str_match = ''
+  AND regexp(note_text, '(?i)(no\\s*significant\\s*dysfunction\\s*of\\s*tricuspid\\s*or\\s*neoaortic\\s*valves|no\\s*significant\\s*neoaortic\\s*valve\\s*or\\s*tricuspid\\s*valve\\s*insufficiency|no\\s*significant\\s*neoaortic\\s*insufficiency\\s*or\\s*tricuspid\\s*valve\\s*insufficiency|no\\s*significant\\s*tricuspid\\s*or\\s*pulmonary\\s*valve\\s*dysfunction|normal\\s*sized\\s*Tricuspid\\s*annulus\\s*without\\s*significant\\s*insufficiency|no\\s*significant\\s*valvar\\s*insufficiency)');
+
+%sql
+create or replace table sudeep_mprint_hlhs.norwood_multiple_rv_scores_diff as 
+select distinct b.study_id, b.mrn, b.note_date, b.note_text, b.rv_str_match, max(b.rv_score) as rv_score
+from sudeep_mprint_hlhs.norwood_notes_regex_all_explo a join 
+sudeep_mprint_hlhs.norwood_notes_regex_all_explo_all_occurrences b on a.study_id = b.study_id and a.mrn = b.mrn and a.note_date = b.note_date and a.note_text = b.note_text
+where (b.rv_score > a.rv_score)
+group by 1, 2, 3, 4, 5
+order by study_id, note_date;
+
+%sql
+create or replace table sudeep_mprint_hlhs.norwood_multiple_av_scores_diff as 
+select distinct b.study_id, b.mrn, b.note_date, b.note_text, b.av_str_match, max(b.av_score) as av_score
+from sudeep_mprint_hlhs.norwood_notes_regex_all_explo a join 
+sudeep_mprint_hlhs.norwood_notes_regex_all_explo_all_occurrences b on a.study_id = b.study_id and a.mrn = b.mrn and a.note_date = b.note_date and a.note_text = b.note_text
+where (b.av_score > a.av_score)
+group by 1, 2, 3, 4, 5
+order by study_id, note_date;
+
+%sql
+MERGE INTO sudeep_mprint_hlhs.norwood_notes_regex_all_explo AS target
+USING sudeep_mprint_hlhs.norwood_multiple_rv_scores_diff AS source
+ON target.study_id = source.study_id AND
+   target.mrn = source.mrn AND
+   target.note_date = source.note_date AND
+   target.note_text = source.note_text
+WHEN MATCHED THEN
+  UPDATE SET
+    target.rv_str_match = source.rv_str_match,
+    target.rv_score = source.rv_score;
+
+%sql
+MERGE INTO sudeep_mprint_hlhs.norwood_notes_regex_all_explo AS target
+USING sudeep_mprint_hlhs.norwood_multiple_av_scores_diff AS source
+ON target.study_id = source.study_id AND
+   target.mrn = source.mrn AND
+   target.note_date = source.note_date AND
+   target.note_text = source.note_text
+WHEN MATCHED THEN
+  UPDATE SET
+    target.av_str_match = source.av_str_match,
+    target.av_score = source.av_score;
+
+
+%sql
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set rv_str_match =  
+  CASE 
+    WHEN regexp_extract(note_text, '(?i)(mildly to moderately decreased function|moderately decreased function|good wall motion|normal wall motion|good freewall motion|good free wall motion|vigorous overall wall motion|improved rv wall motion|preserved wall motion|right ventricle has normal size and function|right ventricle\\s*with normal systolic wall motion)') <> '' 
+    THEN regexp_extract(note_text, '(?i)(mildly to moderately decreased function|moderately decreased function|good wall motion|normal wall motion|good freewall motion|good free wall motion|vigorous overall wall motion|improved rv wall motion|preserved wall motion|right ventricle has normal size and function|right ventricle\\s*with normal systolic wall motion)', 1)
+    ELSE rv_str_match
+  END,
+  rv_score = 0  
+WHERE rv_str_match = ''
+  AND regexp(note_text, '(?i)mildly to moderately decreased function|moderately decreased function|good wall motion|normal wall motion|good freewall motion|good free wall motion|vigorous overall wall motion|improved rv wall motion|preserved wall motion|right ventricle has normal size and function|right ventricle\\s*with normal systolic wall motion');
+
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set rv_str_match =  
+  CASE 
+    WHEN regexp_extract(note_text, '(?i)(borderline/mildly depressed rv wall motion)') <> '' 
+    THEN regexp_extract(note_text, '(?i)(borderline/mildly depressed rv wall motion)', 1)
+    ELSE rv_str_match
+  END,
+  rv_score = 1  
+WHERE regexp(note_text, '(?i)borderline/mildly depressed rv wall motion');
+
+update sudeep_mprint_hlhs.norwood_notes_regex_all_explo
+set rv_str_match =  
+  CASE 
+    WHEN regexp_extract(note_text, '(?i)(rv with mildly depressed systolic wall motion)') <> '' 
+    THEN regexp_extract(note_text, '(?i)(rv with mildly depressed systolic wall motion)', 1)
+    ELSE rv_str_match
+  END,
+  rv_score = 2
+WHERE regexp(note_text, '(?i)rv with mildly depressed systolic wall motion');

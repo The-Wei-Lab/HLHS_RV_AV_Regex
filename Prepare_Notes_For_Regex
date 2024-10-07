@@ -1,0 +1,30 @@
+%sql
+-- Norwood
+-- Select output for review
+-- Find all radiology reports with specific note titles
+-- Add Norwood to Glenn, then date of transplant, then date of mortality, then date of shunt then date of last f/u
+
+create or replace table workspace_rdphenotypecore.sudeep_mprint_hlhs.combined_notes as 
+
+select p.person_id, p.study_id, p.mrn, p.nwdate as norwood_date, p.date_g as glenn_date, p.date_f as fontan_date, 
+p.hybriddate as hybriddate, p.txdate as tx_date, p.mdate as mortality_date, p.shuntdate, p.last_visit, n.note_date, n.note_title, n.note_type_concept_id, n.x_doc_type, n.note_source_value, n.note_text
+from workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid as p 
+inner join victr_rd.rd_omop_prod.note as n
+on p.person_id = n.person_id
+where (
+  ( -- Define radiology reports
+    ( -- Note type
+    n.x_doc_type = 'RAD'
+    OR
+    n.note_type_concept_id = '44814641'
+  )
+  AND -- Note title
+  lower(n.note_title) in ('echocardiogram', 'transthoracic echocardiogram report', 'echocardiography')
+  )
+  AND -- Note date after person's date of birth
+  (
+
+    n.note_date >= p.dob
+  )
+)
+

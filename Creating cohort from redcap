@@ -1,0 +1,14 @@
+select * from workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data;
+
+
+create or replace table workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data_pid as 
+with t as ( 
+    select  p.person_id, g.*
+           from workspace_rdphenotypecore.sudeep_mprint_hlhs.hlhs_cardiomyopathy_data as g 
+        left join victr_rd.rd_omop_prod.person as p
+            on g.MRN = p.person_source_value
+)
+select t.*, max(v.visit_start_date) as last_visit from t
+left join victr_rd.rd_omop_prod.visit_occurrence as v
+on v.person_id = t.person_id
+group by all
